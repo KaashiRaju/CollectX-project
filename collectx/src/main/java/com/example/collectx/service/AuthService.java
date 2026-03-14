@@ -1,6 +1,7 @@
 package com.example.collectx.service;
 
 import com.example.collectx.dto.SignupRequest;
+import com.example.collectx.dto.LoginRequest;
 import com.example.collectx.entity.User;
 import com.example.collectx.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +20,26 @@ public class AuthService {
         }
 
         User user = new User();
-
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword());
-
-        user.setRoles("AGENT");     // server decides role
-        user.setStatus("ACTIVE");  // server decides status
+        user.setRoles("AGENT");
+        user.setStatus("ACTIVE");
 
         userRepository.save(user);
 
         return "User registered successfully";
+    }
+
+    public String login(LoginRequest request) {
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!user.getPassword().equals(request.getPassword())) {
+            return "Invalid password";
+        }
+
+        return "Login successful";
     }
 }
