@@ -3,15 +3,28 @@ package com.example.collectx.service;
 import com.example.collectx.dto.SignupRequest;
 import com.example.collectx.dto.LoginRequest;
 import com.example.collectx.entity.User;
+import com.example.collectx.entity.AuditLog;
 import com.example.collectx.repository.UserRepository;
+import com.example.collectx.repository.AuditLogRepository;
+import com.example.collectx.dto.LoginResponse;
+
+import com.example.collectx.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 public class AuthService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private AuditLogRepository auditLogRepository;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     public String signup(SignupRequest request) {
 
@@ -28,18 +41,37 @@ public class AuthService {
 
         userRepository.save(user);
 
+        // 🔹 Create Audit Log for Signup
+        AuditLog log = new AuditLog();
+        log.setAction("SIGNUP");
+        log.setResource("AUTH");
+        log.setTimestamp(LocalDateTime.now());
+        log.setUser(user);
+
+        auditLogRepository.save(log);
+
         return "User registered successfully";
     }
 
-    public String login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request) {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!user.getPassword().equals(request.getPassword())) {
-            return "Invalid password";
+            throw new RuntimeException("Invalid password");
         }
 
-        return "Login successful";
+        String token = jwtUtil.generateToken(user.getEmail());
+
+        AuditLog log = new AuditLog();
+        log.setAction("LOGIN");
+        log.setResource("AUTH");
+        log.setTimestamp(LocalDateTime.now());
+        log.setUser(user);
+
+        auditLogRepository.save(log);
+
+        return new LoginResponse(token);
     }
 }

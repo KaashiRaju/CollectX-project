@@ -5,6 +5,7 @@ import com.example.collectx.dto.LoginRequest;
 import com.example.collectx.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import com.example.collectx.dto.LoginResponse;
 
 @RestController
 @RequestMapping("/auth")
@@ -19,7 +20,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) {
+    public LoginResponse login(@RequestBody LoginRequest request) {
         return authService.login(request);
     }
+
 }
