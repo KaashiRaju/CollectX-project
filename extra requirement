@@ -1,0 +1,21 @@
+# Why these 4 make your project "Microservice Ready"
+BCrypt: Ensures you are following industry security standards (OWASP).
+
+Global Exception Handling: Makes your API "user-friendly" for the frontend developer.
+
+JWT Claims: This is the "secret sauce" for microservices. It allows your Case Handling Service to know who the user is without ever talking to the Auth Service database.
+
+Logout Audit: Completes the "Life Cycle" of a session for compliance.
+
+
+## 2. RBAC - Role-Based Access Control (The "Key" Check)
+
+1. JWT Token Validation (The "ID Card" Check)
+
+
+
+Add BCrypt: Update AuthService to hash passwords during signup and check them during login.
+
+Enhance JWT Claims: Update your JwtUtil to include roles and userId in the payload.
+
+Add Global Exception Handling: Create a @RestControllerAdvice class so that "User Not Found" returns a clean 404 instead of a crash.
